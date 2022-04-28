@@ -21,6 +21,10 @@
         <url>http://repo.spring.io/release/</url>
         <snapshots><enabled>false</enabled></snapshots>
     </repository>
+    <repository>
+    	<id>java.net</id>
+    	<url>http://download.java.net/maven/2</url>
+	</repository>
   </repositories>
 
   <dependencies>
@@ -42,6 +46,25 @@
         <artifactId>spring-web</artifactId>
         <version>${org.springframework.version}</version>
     </dependency>
+    
+	<dependency>
+    	<groupId>javax.servlet</groupId>
+    	<artifactId>javax.servlet-api</artifactId>
+    	<version>4.0.1</version>
+    	<scope>provided</scope>
+	</dependency>
+	
+	<dependency>
+   		<groupId>org.eclipse.jetty</groupId>
+    	<artifactId>jetty-server</artifactId>
+    	<version>9.4.3.v20170317</version>
+	</dependency>
+	<dependency>
+    	<groupId>org.eclipse.jetty</groupId>
+    	<artifactId>jetty-servlet</artifactId>
+    	<version>9.4.3.v20170317</version>
+	</dependency>
+    
     
   </dependencies>
   
