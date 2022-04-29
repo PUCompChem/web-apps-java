@@ -1,30 +1,100 @@
 package pu.web.cheminfo.servlets;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+import org.openscience.cdk.interfaces.IAtomContainer;
+
+import ambit2.smarts.IsomorphismTester;
+import ambit2.smarts.SmartsHelper;
+import ambit2.smarts.SmartsParser;
+import ambit2.smarts.groups.GroupMatch;
+
 public class MoleculeServlet extends HttpServlet {
-	 
-	   private String message;
 
-	   public void init() throws ServletException {
-	      // Do required initialization
-	      message = "Molecule test";
-	   }
+	List<String> errors = new ArrayList<String>();
+	
+	public void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException 
+	{
+		errors.clear();
+		
+		// Set response content type
+		response.setContentType("text/html");
 
-	   public void doGet(HttpServletRequest request, HttpServletResponse response)
-	      throws ServletException, IOException {
-	      
-	      // Set response content type
-	      response.setContentType("text/html");
 
-	      // Actual logic goes here.
-	      PrintWriter out = response.getWriter();
-	      out.println("<h1>" + message + "</h1>");
-	   }
+		PrintWriter out = response.getWriter();
+		String title = "Molecule";
+		String docType =
+				"<!doctype html public \"-//w3c//dtd html 4.0 " + "transitional//en\">\n";
+		
+		
+		IAtomContainer mol =  createMolecule(request);
+		
+		out.println(docType +
+				"<html>\n" +
+				"<head><title>" + title + "</title></head>\n" +
+				"<body bgcolor = \"#f0f0f0\">\n" +
+				"<h1 align = \"center\">" + title + "</h1>\n");
 
-	   public void destroy() {
-	      // do nothing.
-	   }
+		if (!errors.isEmpty())
+			out.println(getErrorOut());
+		else
+			out.println(getMoleculeOut(mol));
+
+		out.println(
+				"</body>" +
+				"</html>");
 	}
+
+	public void destroy() {
+		// do nothing.
+	}
+
+
+	public IAtomContainer createMolecule(HttpServletRequest request) 
+	{
+		//Try create molecule from smiles
+		String smiles = request.getParameter("smiles");
+		if (smiles != null)
+		try {
+			IAtomContainer mol = SmartsHelper.getMoleculeFromSmiles(smiles, true);
+			mol.setProperty("M_SMILES", smiles);
+			return mol;
+
+		} catch (Exception e) {
+			errors.add( "Cdk error smiles processing: " +smiles);
+			
+		}
+		
+		errors.add("Missing parameters for molecule creation !");
+		return null;
+	}
+	
+	public String getErrorOut() {
+		String errOut = "<ul>\n";
+		for (String err : errors)
+			errOut += "  <li><b> " + err + "</b>";
+		
+		errOut += "</ul>\n";
+		return errOut;
+	}
+	
+	public String getMoleculeOut(IAtomContainer mol) {		
+		String errOut = "<ul>\n";
+		
+		String smiles = mol.getProperty("M_SMILES");
+		if (smiles != null)
+			errOut += "  <li><b> SMILES : "  + smiles + "</b>";
+		errOut += "  <li><b> Number of atoms : "  + mol.getAtomCount() + "</b>";
+		errOut += "  <li><b> Number of bonds : "  + mol.getBondCount() + "</b>";
+		
+		errOut += "</ul>\n";
+		return errOut;
+	}
+
+}

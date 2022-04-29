@@ -5,6 +5,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletHandler;
 
+import pu.web.cheminfo.servlets.HomeServlet;
 import pu.web.cheminfo.servlets.MoleculeServlet;
 
 public class TestJettyServer01 {
@@ -28,13 +29,15 @@ public class TestJettyServer01 {
 		ServerConnector connector = new ServerConnector(server);
 		connector.setPort(8080);
 		server.setConnectors(new Connector[] {connector});        
-		ServletHandler servletHandler = new ServletHandler();
-		server.setHandler(servletHandler);
+		
 		
 		//Servlet mappings
+		ServletHandler servletHandler = new ServletHandler();
+		server.setHandler(servletHandler);
+		servletHandler.addServletWithMapping(HomeServlet.class, "/");
 		servletHandler.addServletWithMapping(MoleculeServlet.class, "/molecule");
-
-
+		
+		
 		server.start();
 
 	}
