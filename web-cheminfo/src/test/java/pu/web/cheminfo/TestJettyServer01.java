@@ -7,6 +7,8 @@ import org.eclipse.jetty.servlet.ServletHandler;
 
 import pu.web.cheminfo.servlets.HomeServlet;
 import pu.web.cheminfo.servlets.MoleculeServlet;
+import pu.web.cheminfo.servlets.MoleculesServlet;
+
 
 public class TestJettyServer01 {
 
@@ -36,8 +38,9 @@ public class TestJettyServer01 {
 		server.setHandler(servletHandler);
 		servletHandler.addServletWithMapping(HomeServlet.class, "/");
 		servletHandler.addServletWithMapping(MoleculeServlet.class, "/molecule");
+		servletHandler.addServletWithMapping(MoleculesServlet.class, "/molecules");
 		
-		
+				
 		server.start();
 
 	}
