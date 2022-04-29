@@ -13,6 +13,7 @@ import ambit2.smarts.IsomorphismTester;
 import ambit2.smarts.SmartsHelper;
 import ambit2.smarts.SmartsParser;
 import ambit2.smarts.groups.GroupMatch;
+import pu.web.cheminfo.ChemInfoServer;
 
 public class MoleculeServlet extends HttpServlet {
 
@@ -33,7 +34,7 @@ public class MoleculeServlet extends HttpServlet {
 				"<!doctype html public \"-//w3c//dtd html 4.0 " + "transitional//en\">\n";
 		
 		
-		IAtomContainer mol =  createMolecule(request);
+		IAtomContainer mol = createMolecule(request);
 		
 		out.println(docType +
 				"<html>\n" +
@@ -58,18 +59,31 @@ public class MoleculeServlet extends HttpServlet {
 
 	public IAtomContainer createMolecule(HttpServletRequest request) 
 	{
-		//Try create molecule from smiles
+		//Try to create molecule from smiles
 		String smiles = request.getParameter("smiles");
 		if (smiles != null)
 		try {
 			IAtomContainer mol = SmartsHelper.getMoleculeFromSmiles(smiles, true);
 			mol.setProperty("M_SMILES", smiles);
-			return mol;
-
-		} catch (Exception e) {
-			errors.add( "Cdk error smiles processing: " +smiles);
 			
+			//Register molecule
+			ChemInfoServer.defaultServer.addMolecule(mol);			
+			return mol;
+		} 
+		catch (Exception e) {
+			errors.add( "Cdk error smiles processing: " +smiles);			
 		}
+		
+		//Try to get existing molecule from server
+		String id = request.getParameter("id");
+		if (id != null) {
+			IAtomContainer mol = ChemInfoServer.defaultServer.getMoleculeById(id);
+			if (mol == null)
+				errors.add( "Incorrect molecule id. Molecule with id = " + id + " does not exists!");	
+			return mol;
+				
+		}
+		
 		
 		errors.add("Missing parameters for molecule creation !");
 		return null;

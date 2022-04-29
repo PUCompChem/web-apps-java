@@ -20,7 +20,17 @@ public class ChemInfoServer
 		if (molecules.size() >= maxNumberOfMolecules)
 			molecules.remove(0);
 		molecules.add(mol);
-		mol.setProperty("M_ID", nextID);
+		mol.setProperty("M_ID", "" + nextID); //id is stored as string
 		nextID++;
 	}
+	
+	public IAtomContainer getMoleculeById(String id) {
+		for (IAtomContainer mol : molecules) {
+			if (mol.getProperty("M_ID").equals(id))
+				return mol;
+		}
+			
+		return null;
+	}
+
 }
